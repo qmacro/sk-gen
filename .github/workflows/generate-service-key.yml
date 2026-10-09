@@ -50,6 +50,8 @@ jobs:
         run: cf create-service-key "$CF_SERVICE_INSTANCE" "$CF_SERVICE_KEY"
 
       - name: Retrieve service key and write to zip
+        env:
+          SK_PASSWORD: ${{ secrets.SK_PASSWORD }}
         run: |
           mkdir -p keys
           OUTFILE="keys/${CF_SERVICE_KEY}.json"
@@ -60,8 +62,8 @@ jobs:
             | tail -n +3 \
             > "$OUTFILE"
 
-          # Zip with maximum compression; keep only the file, no directory prefix
-          zip -9j "$ZIPFILE" "$OUTFILE"
+          # Zip with maximum compression, no directory prefix, and AES-256 password encryption
+          zip -9j --encrypt --password "$SK_PASSWORD" "$ZIPFILE" "$OUTFILE"
 
           # Remove the plain JSON file so only the zip is committed
           rm "$OUTFILE"

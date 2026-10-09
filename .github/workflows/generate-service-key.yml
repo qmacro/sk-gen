@@ -10,7 +10,7 @@ jobs:
 
     env:
       # Hardcoded service instance and base key name - a short GUID is appended at runtime
-      CF_SERVICE_INSTANCE: my-service-instance
+      CF_SERVICE_INSTANCE: generative-ai-hub
       CF_SERVICE_KEY_BASE: my-service-key
 
     steps:

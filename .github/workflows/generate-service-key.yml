@@ -6,7 +6,7 @@ on:
 jobs:
   generate-service-key:
     name: Create CF service key and commit zipped output
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
 
@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
 
       - name: Generate unique service key name
         run: |

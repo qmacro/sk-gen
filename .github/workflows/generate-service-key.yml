@@ -7,6 +7,8 @@ jobs:
   generate-service-key:
     name: Create CF service key and commit zipped output
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     env:
       # Hardcoded service instance and base key name - a short GUID is appended at runtime
@@ -71,6 +73,9 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Authenticate push via GITHUB_TOKEN
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
 
           git add "keys/${CF_SERVICE_KEY}.zip"
 

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# Delete selected service keys. Note that this will not remove any files in
+# keys/. Only for manual use.
+
+set -euo pipefail
+
+CF_SERVICE_INSTANCE="${CF_SERVICE_INSTANCE:-generative-ai-hub}"
+
+echo "Service instance: $CF_SERVICE_INSTANCE"
+
+# Retrieve list of service key names for the instance
+mapfile -t SELECTED < <(
+  cf service-keys "$CF_SERVICE_INSTANCE" \
+    | tail -n +4 \
+    | awk '{print $1}' \
+    | fzf --multi --prompt "Select keys for deletion"
+)
+
+if [[ ${#SELECTED[@]} -eq 0 ]]; then
+  echo "No service keys selected."
+  exit 0
+fi
+
+echo "${#SELECTED[@]} service key(s) selected for deletion."
+
+for SK_NAME in "${SELECTED[@]}"; do
+  cf delete-service-key "$CF_SERVICE_INSTANCE" "$SK_NAME" -f
+done

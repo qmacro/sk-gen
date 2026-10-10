@@ -11,20 +11,11 @@ jobs:
       contents: write
 
     env:
-      # Hardcoded service instance and base key name - a short GUID is appended at runtime
       CF_SERVICE_INSTANCE: generative-ai-hub
-      CF_SERVICE_KEY_BASE: my-service-key
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
-
-      - name: Generate unique service key name
-        run: |
-          GUID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-8)
-          CF_SERVICE_KEY="${CF_SERVICE_KEY_BASE}-${GUID}"
-          echo "CF_SERVICE_KEY=${CF_SERVICE_KEY}" >> "$GITHUB_ENV"
-          echo "Service key name: $CF_SERVICE_KEY"
 
       - name: Install cf CLI v8
         run: |
@@ -47,29 +38,14 @@ jobs:
           cf target -o "$CF_ORG" -s "$CF_SPACE"
 
       - name: Create service key
-        run: cf create-service-key "$CF_SERVICE_INSTANCE" "$CF_SERVICE_KEY"
-
-      - name: Retrieve service key and write to zip
         env:
           SK_PASSWORD: ${{ secrets.SK_PASSWORD }}
-        run: |
-          mkdir -p keys
-          OUTFILE="keys/${CF_SERVICE_KEY}.json"
-          ZIPFILE="keys/${CF_SERVICE_KEY}.zip"
+        run: ./generate
 
-          # Write raw JSON content (strip the two informational header lines cf emits)
-          cf service-key "$CF_SERVICE_INSTANCE" "$CF_SERVICE_KEY" \
-            | tail -n +3 \
-            > "$OUTFILE"
-
-          # Zip with maximum compression, no directory prefix, and AES-256 password encryption
-          zip -9j --encrypt --password "$SK_PASSWORD" "$ZIPFILE" "$OUTFILE"
-
-          # Remove the plain JSON file so only the zip is committed
-          rm "$OUTFILE"
-
-          echo "Created $ZIPFILE"
-          ls -lh keys/
+      - name: Remove old service keys
+        env:
+          SK_MAX_AGE: 30
+        run: ./cleanup
 
       - name: Commit and push zip file
         run: |
@@ -79,11 +55,11 @@ jobs:
           # Authenticate push via GITHUB_TOKEN
           git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
 
-          git add "keys/${CF_SERVICE_KEY}.zip"
+          git add keys/
 
           if git diff --cached --quiet; then
-            echo "No changes to commit (zip already up to date)"
+            echo "No changes to commit"
           else
-            git commit -m "chore: add service key ${CF_SERVICE_KEY} [skip ci]"
+            git commit -m "chore: rotate service keys [skip ci]"
             git push
           fi

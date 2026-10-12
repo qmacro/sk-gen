@@ -10,10 +10,11 @@ KEYS_DIR="$(dirname "$0")/keys"
 NOW=$(date +%s)
 MAX_AGE_SECS=$(( SK_MAX_AGE * 60 ))
 
+mkdir -p "$KEYS_DIR"
+
 if [[ ! -d "$KEYS_DIR" ]]; then
   echo "Keys directory not found: $KEYS_DIR"
   exit 1
 fi
 
-mkdir -p "$KEYS_DIR"
 echo "Service instance : $CF_SERVICE_INSTANCE"

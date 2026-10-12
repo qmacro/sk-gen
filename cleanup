@@ -2,20 +2,9 @@
 
 set -euo pipefail
 
-CF_SERVICE_INSTANCE="${CF_SERVICE_INSTANCE:-generative-ai-hub}"
-SK_MAX_AGE="${SK_MAX_AGE:-15}"
+source ./common.sh
 
-KEYS_DIR="$(dirname "$0")/keys"
-NOW=$(date +%s)
-MAX_AGE_SECS=$(( SK_MAX_AGE * 60 ))
-
-echo "Service instance : $CF_SERVICE_INSTANCE"
-echo "Max age (mins)   : $SK_MAX_AGE"
-
-if [[ ! -d "$KEYS_DIR" ]]; then
-  echo "Keys directory not found: $KEYS_DIR"
-  exit 1
-fi
+echo "Max age (mins) : $SK_MAX_AGE"
 
 shopt -s nullglob
 FILES=("$KEYS_DIR"/*)

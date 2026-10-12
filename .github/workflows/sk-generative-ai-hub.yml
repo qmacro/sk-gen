@@ -1,4 +1,4 @@
-name: Generate Service Key
+name: Temp service keys for Generative AI Hub
 
 on:
   workflow_dispatch:

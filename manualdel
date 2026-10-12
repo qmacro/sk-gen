@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# Delete selected service keys. Note that this will not remove any files in
-# keys/. Only for manual use.
+# CF-focused manual utility only.
+#
+# Delete selected service keys.
+# Note that this will not remove any files in keys/.
 
 set -euo pipefail
 
-CF_SERVICE_INSTANCE="${CF_SERVICE_INSTANCE:-generative-ai-hub}"
-
-echo "Service instance: $CF_SERVICE_INSTANCE"
+source ./common.sh
 
 # Retrieve list of service key names for the instance
 mapfile -t SELECTED < <(

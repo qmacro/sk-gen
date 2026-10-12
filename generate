@@ -2,11 +2,8 @@
 
 set -euo pipefail
 
-CF_SERVICE_INSTANCE="${CF_SERVICE_INSTANCE:-generative-ai-hub}"
-SK_PASSWORD="${SK_PASSWORD:-test}"
-SK_NAME="sk-$(date +%Y%m%d%H%M%S)"
+source ./common.sh
 
-echo "Service instance : $CF_SERVICE_INSTANCE"
 echo "Service key name : $SK_NAME"
 
 # Create the service key
@@ -21,8 +18,7 @@ cf service-key "$CF_SERVICE_INSTANCE" "$SK_NAME" \
   > "$JSON_FILE"
 
 # Store in a password-protected zip (AES-256), then remove the plain JSON
-mkdir -p keys
-ZIP_FILE="keys/${SK_NAME}.zip"
+ZIP_FILE="$KEYS_DIR/${SK_NAME}.zip"
 zip --quiet --encrypt --password "$SK_PASSWORD" -9j "$ZIP_FILE" "$JSON_FILE"
 rm "$JSON_FILE"
 

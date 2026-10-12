@@ -2,6 +2,8 @@ name: Temp service keys for Generative AI Hub
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "*/25 * * * *"
 
 jobs:
   generate-service-key:

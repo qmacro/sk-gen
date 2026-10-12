@@ -7,7 +7,7 @@ on:
 
 jobs:
   generate-service-key:
-    name: Create CF service key and commit zipped output
+    name: Maintain temporary service keys
     runs-on: ubuntu-26.04
     permissions:
       contents: write
@@ -39,7 +39,7 @@ jobs:
           cf auth "$CF_USERNAME" "$CF_PASSWORD"
           cf target -o "$CF_ORG" -s "$CF_SPACE"
 
-      - name: Create service key
+      - name: Generate new temporary service key
         env:
           SK_PASSWORD: ${{ secrets.SK_PASSWORD }}
         run: ./generate
